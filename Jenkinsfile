@@ -2,13 +2,13 @@ pipeline {
     agent any
 
     environment {
-        MAJOR                   = '1'
-        MINOR                   = '0'
-        PATH                    = "C:\\Program Files\\dotnet;${env.PATH}"
-        UIPATH_ORCH_URL         = "https://cloud.uipath.com/noviorg/DefaultTenant/orchestrator_/"
+        MAJOR                    = '1'
+        MINOR                    = '0'
+        PATH                     = "C:\\Program Files\\dotnet;${env.PATH}"
+        UIPATH_ORCH_URL          = "https://cloud.uipath.com/noviorg/DefaultTenant/orchestrator_/"
         UIPATH_ORCH_LOGICAL_NAME = "noviorg"
-        UIPATH_ORCH_TENANT_NAME = "DefaultTenant"
-        UIPATH_ORCH_FOLDER_NAME = "TestSuite"
+        UIPATH_ORCH_TENANT_NAME  = "DefaultTenant"
+        UIPATH_ORCH_FOLDER_NAME  = "TestSuite"
     }
 
     stages {
@@ -35,11 +35,11 @@ pipeline {
             steps {
                 echo "Building with ${WORKSPACE}"
                 UiPathPack(
-                    outputPath:       "Output\\${env.BUILD_NUMBER}",
-                    projectJsonPath:  "project.json",
-                    version:          [$class: 'ManualVersionEntry', version: "${MAJOR}.${MINOR}.${env.BUILD_NUMBER}"],
-                    useOrchestrator:  false,
-                    traceLevel:       'None'
+                    outputPath:      "Output\\${env.BUILD_NUMBER}",
+                    projectJsonPath: "project.json",
+                    version:         [$class: 'ManualVersionEntry', version: "${MAJOR}.${MINOR}.${env.BUILD_NUMBER}"],
+                    useOrchestrator: false,
+                    traceLevel:      'None'
                 )
             }
         }
@@ -54,13 +54,12 @@ pipeline {
             steps {
                 echo "Deploying ${env.BRANCH_NAME} to UAT"
                 UiPathDeploy(
-                    packagePath:        "Output\\${env.BUILD_NUMBER}",
+                    packagePath:         "Output\\${env.BUILD_NUMBER}",
                     orchestratorAddress: "${UIPATH_ORCH_URL}",
                     orchestratorTenant:  "${UIPATH_ORCH_TENANT_NAME}",
                     folderName:          "${UIPATH_ORCH_FOLDER_NAME}",
                     environments:        '',
-                    // use PAT via Secret Text
-                    credentialsId:        'APIUserKey',
+                    credentialsId:       'APIUserKey',
                     traceLevel:          'None',
                     entryPointPaths:     'Main.xaml',
                     createProcess:       true
