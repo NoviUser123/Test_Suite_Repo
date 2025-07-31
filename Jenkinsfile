@@ -60,7 +60,7 @@ pipeline {
                     folderName:          "${UIPATH_ORCH_FOLDER_NAME}",
                     environments:        '',
                     // use PAT via Secret Text
-                    credentials:         [ $class: 'SecretTextAuthenticationEntry', credentialsId: 'APIUserKey' ],
+                    credentials:         [ $class: 'RefreshTokenAuthenticationEntry', credentialsId: 'APIUserKey' ],
                     traceLevel:          'None',
                     entryPointPaths:     'Main.xaml',
                     createProcess:       true
