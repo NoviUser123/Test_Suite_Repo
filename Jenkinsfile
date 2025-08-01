@@ -70,7 +70,7 @@ pipeline {
             orchestratorTenant: "${UIPATH_ORCH_TENANT_NAME}",
             folderName: "${UIPATH_ORCH_FOLDER_NAME}",
             environments: '',
-            credentials: [$class: 'CloudOrchestratorAuthenticationEntry', credentialsId: 'APIUserKey'],
+            credentials: [$class: 'RefreshTokenAuthenticationEntry', credentialsId: 'APIUserKey'],
             traceLevel: 'None',
             entryPointPaths: 'Main.xaml',
             createProcess: true
