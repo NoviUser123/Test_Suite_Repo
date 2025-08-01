@@ -1,12 +1,11 @@
 pipeline {
     agent any
 
-    // ✅ Environment Variables
     environment {
         MAJOR = '1'
         MINOR = '0'
 
-        // ✅ Add dotnet to PATH
+        // Add dotnet to PATH
         PATH = "C:\\Program Files\\dotnet;${env.PATH}"
 
         // Orchestrator Services
@@ -17,20 +16,17 @@ pipeline {
     }
 
     stages {
-
-        // 📌 Preparing Stage
         stage('Preparing') {
             steps {
                 echo "Jenkins Home ${env.JENKINS_HOME}"
                 echo "Jenkins URL ${env.JENKINS_URL}"
                 echo "Jenkins JOB Number ${env.BUILD_NUMBER}"
                 echo "Jenkins JOB Name ${env.JOB_NAME}"
-                echo "GitHub BranhName ${env.BRANCH_NAME}"
+                echo "GitHub BranchName ${env.BRANCH_NAME}"
                 checkout scm
             }
         }
 
-        // 🔍 Debug dotnet availability
         stage('Verify dotnet') {
             steps {
                 bat 'echo %PATH%'
@@ -39,7 +35,6 @@ pipeline {
             }
         }
 
-        // 🛠 Build Stage
         stage('Build') {
             steps {
                 echo "Building..with ${WORKSPACE}"
@@ -53,31 +48,37 @@ pipeline {
             }
         }
 
-        // ✅ Test Stage
         stage('Test') {
             steps {
                 echo 'Testing..the workflow...'
             }
         }
 
-        // 🚀 Deploy to UAT Stage
-       stage('Deploy to UAT') {
-    steps {
-        echo "Deploying ${env.BRANCH_NAME} to UAT"
-        UiPathDeploy(
-            packagePath: "Output\\${env.BUILD_NUMBER}",
-            orchestratorAddress: "${UIPATH_ORCH_URL}",
-            orchestratorTenant: "${UIPATH_ORCH_TENANT_NAME}",
-            folderName: "${UIPATH_ORCH_FOLDER_NAME}",
-            environments: '',
-            credentials: [$class: 'RefreshTokenAuthenticationEntry', credentialsId: 'APIUserKey'],
-            traceLevel: 'None',
-            entryPointPaths: 'Main.xaml',
-            createProcess: true
-        )
-    }
-}
-        // 🚀 Deploy to Production Stage
+        stage('Deploy to UAT') {
+            steps {
+                echo "Deploying ${env.BRANCH_NAME} to UAT"
+                UiPathDeploy(
+                    packagePath: "Output\\${env.BUILD_NUMBER}",
+                    orchestratorAddress: "${UIPATH_ORCH_URL}",
+                    orchestratorTenant: "${UIPATH_ORCH_TENANT_NAME}",
+                    folderName: "${UIPATH_ORCH_FOLDER_NAME}",
+                    environments: '',
+
+                    // ✅ External App Authentication (via Jenkins Credentials)
+                    credentials: [
+                        $class: 'ExternalAppAuthenticationEntry',
+                        credentialsId: 'MyExternalAppCreds',
+                        accountLogicalName: "${UIPATH_ORCH_LOGICAL_NAME}",
+                        tenantLogicalName: "${UIPATH_ORCH_TENANT_NAME}"
+                    ],
+
+                    traceLevel: 'None',
+                    entryPointPaths: 'Main.xaml',
+                    createProcess: true
+                )
+            }
+        }
+
         stage('Deploy to Production') {
             steps {
                 echo 'Deploy to Production'
@@ -85,13 +86,11 @@ pipeline {
         }
     }
 
-    // 🕒 Options
     options {
         timeout(time: 80, unit: 'MINUTES')
         skipDefaultCheckout()
     }
 
-    // ✅ Post Actions
     post {
         success {
             echo 'Deployment has been completed!'
