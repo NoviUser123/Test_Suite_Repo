@@ -67,9 +67,10 @@ pipeline {
                     // ✅ External App Authentication (via Jenkins Credentials)
                     credentials: [
                         $class: 'ExternalAppAuthenticationEntry',
-                        credentialsId: 'MyExternalAppCreds',
-                        accountLogicalName: "noviorg",
-                        tenantLogicalName: "DefaultTenant"
+                        applicationId: '7dfa04ba-6317-4faf-a3d0-1692fbf740a9',
+                        applicationSecret: '#eVISBiIp(UDph53zDEsnZW9_VjgahuCQHR6$dB~eI*Y1xt)2ZkZEqj_YivWpH95',
+                        accountLogicalName: 'noviorg',
+                        tenantLogicalName: 'DefaultTenant'
                     ],
 
                     traceLevel: 'None',
