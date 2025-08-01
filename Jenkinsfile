@@ -61,23 +61,22 @@ pipeline {
         }
 
         // 🚀 Deploy to UAT Stage
-        stage('Deploy to UAT') {
-            steps {
-                echo "Deploying ${BRANCH_NAME} to UAT "
-                UiPathDeploy(
-                    packagePath: "Output\\${env.BUILD_NUMBER}",
-                    orchestratorAddress: "${UIPATH_ORCH_URL}",
-                    orchestratorTenant: "${UIPATH_ORCH_TENANT_NAME}",
-                    folderName: "${UIPATH_ORCH_FOLDER_NAME}",
-                    environments: '',
-                    credentialsId: 'APIUserKey',
-                    traceLevel: 'None',
-                    entryPointPaths: 'Main.xaml',
-                    createProcess: true
-                )
-            }
-        }
-
+       stage('Deploy to UAT') {
+    steps {
+        echo "Deploying ${env.BRANCH_NAME} to UAT"
+        UiPathDeploy(
+            packagePath: "Output\\${env.BUILD_NUMBER}",
+            orchestratorAddress: "${UIPATH_ORCH_URL}",
+            orchestratorTenant: "${UIPATH_ORCH_TENANT_NAME}",
+            folderName: "${UIPATH_ORCH_FOLDER_NAME}",
+            environments: '',
+            credentials: [$class: 'CloudOrchestratorAuthenticationEntry', credentialsId: 'APIUserKey'],
+            traceLevel: 'None',
+            entryPointPaths: 'Main.xaml',
+            createProcess: true
+        )
+    }
+}
         // 🚀 Deploy to Production Stage
         stage('Deploy to Production') {
             steps {
