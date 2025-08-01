@@ -68,8 +68,8 @@ pipeline {
                     credentials: [
                         $class: 'ExternalAppAuthenticationEntry',
                         credentialsId: 'MyExternalAppCreds',
-                        accountLogicalName: "${UIPATH_ORCH_LOGICAL_NAME}",
-                        tenantLogicalName: "${UIPATH_ORCH_TENANT_NAME}"
+                        accountLogicalName: "noviorg",
+                        tenantLogicalName: "DefaultTenant"
                     ],
 
                     traceLevel: 'None',
