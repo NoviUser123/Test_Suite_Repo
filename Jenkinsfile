@@ -27,80 +27,102 @@ pipeline {
             }
         }
 
-        stage('Verify dotnet') {
-            steps {
-                bat 'echo %PATH%'
-                bat 'where dotnet'
-                bat 'dotnet --version'
-            }
-        }
+        stages {
+	
 
-        stage('Build') {
-            steps {
-                echo "Building..with ${WORKSPACE}"
-                UiPathPack(
-                    outputPath: "Output\\${env.BUILD_NUMBER}",
-                    projectJsonPath: "project.json",
-                    version: [$class: 'ManualVersionEntry', version: "${MAJOR}.${MINOR}.${env.BUILD_NUMBER}"],
-                    useOrchestrator: false,
-                    traceLevel: 'None'
-                )
-            }
-        }
+	        // Printing Basic Information
+	        stage('Preparing'){
+	            steps {
+	                echo "Jenkins Home ${env.JENKINS_HOME}"
+	                echo "Jenkins URL ${env.JENKINS_URL}"
+	                echo "Jenkins JOB Number ${env.BUILD_NUMBER}"
+	                echo "Jenkins JOB Name ${env.JOB_NAME}"
+	                echo "GitHub BranhName ${env.BRANCH_NAME}"
+	                checkout scm
+	
 
-        stage('Test') {
-            steps {
-                echo 'Testing..the workflow...'
-            }
-        }
+	            }
+	        }
+	
 
-        stage('Deploy to UAT') {
-            steps {
-                echo "Deploying ${env.BRANCH_NAME} to UAT"
-                UiPathDeploy(
-                    packagePath: "Output\\${env.BUILD_NUMBER}",
-                    orchestratorAddress: "${UIPATH_ORCH_URL}",
-                    orchestratorTenant: "${UIPATH_ORCH_TENANT_NAME}",
-                    folderName: "${UIPATH_ORCH_FOLDER_NAME}",
-                    environments: '',
+	         // Build Stages
+	        stage('Build') {
+	            steps {
+	                echo "Building..with ${WORKSPACE}"
+	                UiPathPack (
+	                      outputPath: "Output\\${env.BUILD_NUMBER}",
+	                      projectJsonPath: "project.json",
+	                      version: [$class: 'ManualVersionEntry', version: "${MAJOR}.${MINOR}.${env.BUILD_NUMBER}"],
+	                      useOrchestrator: false,
+						  traceLevel: 'None'
+	        )
+	            }
+	        }
+	         // Test Stages
+	        stage('Test') {
+	            steps {
+	                echo 'Testing..the workflow...'
+	            }
+	        }
+	
 
-                    // ✅ External App Authentication (via Jenkins Credentials)
-                    credentials: [
-                        $class: 'ExternalAppAuthenticationEntry',
-                        applicationId: '7dfa04ba-6317-4faf-a3d0-1692fbf740a9',
-                        applicationSecret: '#eVISBiIp(UDph53zDEsnZW9_VjgahuCQHR6$dB~eI*Y1xt)2ZkZEqj_YivWpH95',
-                        accountLogicalName: 'noviorg',
-                        tenantLogicalName: 'DefaultTenant'
-                    ],
-
-                    traceLevel: 'None',
-                    entryPointPaths: 'Main.xaml',
+	         // Deploy Stages
+	        stage('Deploy to UAT') {
+	            steps {
+	                echo "Deploying ${BRANCH_NAME} to UAT "
+	                UiPathDeploy (
+	                packagePath: "Output\\${env.BUILD_NUMBER}",
+	                orchestratorAddress: "${UIPATH_ORCH_URL}",
+	                orchestratorTenant: "${UIPATH_ORCH_TENANT_NAME}",
+	                folderName: "${UIPATH_ORCH_FOLDER_NAME}",
+	                environments: 'DEV',
+	                //credentials: [$class: 'UserPassAuthenticationEntry', credentialsId: 'APIUserKey']
+	                credentials: Token(accountName: "${UIPATH_ORCH_LOGICAL_NAME}", credentialsId: 'APIUserKey'), 
+					traceLevel: 'None',
+					entryPointPaths: 'Main.xaml',
                     createProcess: true
-                )
-            }
-        }
+                    
+	
 
-        stage('Deploy to Production') {
-            steps {
-                echo 'Deploy to Production'
-            }
-        }
-    }
+	        )
+	            }
+	        }
+	
 
-    options {
-        timeout(time: 80, unit: 'MINUTES')
-        skipDefaultCheckout()
-    }
+	
 
-    post {
-        success {
-            echo 'Deployment has been completed!'
-        }
-        failure {
-            echo "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.JOB_DISPLAY_URL})"
-        }
-        always {
-            cleanWs()
-        }
-    }
-}
+	         // Deploy to Production Step
+	        stage('Deploy to Production') {
+	            steps {
+	                echo 'Deploy to Production'
+	                }
+	            }
+	    }
+	
+
+	    // Options
+	    options {
+	        // Timeout for pipeline
+	        timeout(time:80, unit:'MINUTES')
+	        skipDefaultCheckout()
+	    }
+	
+
+	
+
+	    // 
+	    post {
+	        success {
+	            echo 'Deployment has been completed!'
+	        }
+	        failure {
+	          echo "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.JOB_DISPLAY_URL})"
+	        }
+	        always {
+	            /* Clean workspace if success */
+	            cleanWs()
+	        }
+	    }
+	
+
+	}
