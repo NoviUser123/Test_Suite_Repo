@@ -55,25 +55,32 @@ pipeline {
 	
 
 	         // Deploy Stages
-	        stage('Deploy to UAT') {
-	            steps {
-	                echo "Deploying ${BRANCH_NAME} to UAT "
-	                UiPathDeploy (
-	                packagePath: "Output\\${env.BUILD_NUMBER}",
-	                orchestratorAddress: "${UIPATH_ORCH_URL}",
-	                orchestratorTenant: "${UIPATH_ORCH_TENANT_NAME}",
-	                folderName: "${UIPATH_ORCH_FOLDER_NAME}",
-	                environments: '',
-	                //credentials: [$class: 'UserPassAuthenticationEntry', credentialsId: 'APIUserKey']
-	                credentials: Token(accountName: "${UIPATH_ORCH_LOGICAL_NAME}", credentialsId: 'APIUserKey'), 
-					traceLevel: 'None',
-					entryPointPaths: 'Main.xaml',
-					createProcess: true
-	
-
-	        )
-	            }
-	        }
+	       stage ('Build Package') {
+        steps {
+            echo "Start building the package on ${WORKSPACE}\\Output"
+            UiPathPack(
+            credentials: ExternalApp(accountForApp: 'persorrxarsb',
+            applicationId: '42778989-c006-41c7-a13f-3f4651b99034', 
+            applicationScope: 'OR.Assets OR.BackgroundTasks OR.Execution OR.Folders OR.Jobs OR.Machines.Read OR.Monitoring OR.Robots.Read OR.Settings.Read OR.TestSetExecutions OR.TestSets OR.TestSetSchedules OR.Users.Read', 
+            applicationSecret: 'CU#JLLS)Jo%!*bGemeWM(4DkYegu_vY_nfnwvwJj7DU12EIJt1Bl6f%OGB@(_AzE', 
+            identityUrl: ''), 
+            orchestratorAddress: 'https://cloud.uipath.com/',
+             orchestratorTenant: 'DefaultTenant', 
+             outputPath: '${WORKSPACE}\\Output',
+             outputType: 'Process',
+             projectJsonPath: '"C:\\Users\\sanjay.bhat\\OneDrive - Novigo Solutions Pvt. Ltd\\Documents\\UiPath\\BlankProcess1\\project.json"', 
+             projectUrl: '',
+             repositoryBranch: '', 
+             repositoryCommit: '',
+             repositoryType: '', 
+             repositoryUrl: '', 
+             splitOutput: false,
+             disableBuiltInNugetFeeds: false,
+             traceLevel: 'Verbose',
+             useOrchestrator: true,
+             version: CurrentVersion())
+        }
+    }
 	
 
 	
