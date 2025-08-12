@@ -35,7 +35,7 @@ pipeline {
                         accountForApp: "${UIPATH_ORCH_LOGICAL_NAME}",
                         applicationId: '42778989-c006-41c7-a13f-3f4651b99034',
                         applicationScope: 'OR.Assets OR.BackgroundTasks OR.Execution OR.Folders OR.Jobs OR.Machines.Read OR.Monitoring OR.Robots.Read OR.Settings.Read OR.TestSetExecutions OR.TestSets OR.TestSetSchedules OR.Users.Read',
-                        applicationSecret: 'CU#JLLS)Jo%!*bGemeWM(4DkYegu_vY_nfnwvwJj7DU12EIJt1Bl6f%OGB@(_AzE',
+                        applicationSecret: 'ApplicationSecret',
                         identityUrl: ''
                     ),
                     orchestratorAddress: "${UIPATH_ORCH_URL}",
@@ -66,7 +66,7 @@ pipeline {
                         accountForApp: "${UIPATH_ORCH_LOGICAL_NAME}",
                         applicationId: '42778989-c006-41c7-a13f-3f4651b99034',
                         applicationScope: 'OR.Execution OR.Folders OR.Jobs OR.Processes OR.Robots.Read',
-                        applicationSecret: 'CU#JLLS)Jo%!*bGemeWM(4DkYegu_vY_nfnwvwJj7DU12EIJt1Bl6f%OGB@(_AzE',
+                        applicationSecret: 'ApplicationSecret',
                         identityUrl: ''
                     ),
                     traceLevel: 'None',
